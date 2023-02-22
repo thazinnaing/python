@@ -1,0 +1,43 @@
+from pymongo import MongoClient
+
+class delivery:
+
+    def __init__(self):
+
+        try:
+            connection = MongoClient("localhost", 27017)
+            database = connection["DeliveryDB"]
+            collection = database["foodcollection"]
+            print("connect successful")
+            collection.drop()
+        except Exception as error:
+            print(error)
+
+        data = [{"_id": 1, "shop name": "Teapro", "food": ["burger", "sandwich", "tea salad"], "drink": ["tea", "coffee", "cappuccino"]},
+                {"_id": 2, "shop name": "Pann Ei", "food": ["burger", "sandwich", "tea salad"], "drink": ["lemontea", "coffee", "cappuccino"]},
+                {"_id": 3, "shop name": "View Corner", "food": ["rice salad", "sandwich", "tea salad"], "drink": ["tea", "coffee", "cappuccino"]},
+                {"_id": 4, "shop name": "Cafe 99", "food": ["burger", "bread", "tea salad"], "drink": ["tea", "coffee", "cappuccino"]},
+                {"_id": 5, "shop name": "Fudo Bakery", "food": ["burger", "sandwich", "tea salad"], "drink": ["tea", "coffee", "cappuccino"]},
+                {"_id": 6, "shop name": "KoDate", "food": ["burger", "sandwich", "tea salad"], "drink": ["tea", "coffee", "cappuccino", "beer", "wine"]},
+                {"_id": 7, "shop name": "Chuu Bakery", "food": ["burger", "sandwich", "tea salad", "bread", "cake"], "drink": ["tea", "coffee", "cappuccino"]},
+                {"_id": 8, "shop name": "Cafe 11", "food": ["burger", "sandwich", "tea salad", "bread", "rice salad", "noodles"], "drink": ["tea", "coffee", "cappuccino", "beer"]},
+                {"_id": 9, "shop name": "Shwe Lu Lu", "food": ["burger", "sandwich", "tea salad", "hotpot"], "drink": ["tea","coffee", "cappuccino", "wine"]}
+
+        ]
+
+        try:
+            collection.insert_many(data)
+
+            print("Insert successful")
+
+        except Exception as error:
+            print(error)
+
+        data = collection.find().distinct("shop name")
+        for d in data:
+            print(d)
+
+
+obj = delivery()
+
+
