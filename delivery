@@ -1,43 +1,103 @@
 from pymongo import MongoClient
 
+
 class delivery:
+    try:
+        connection = MongoClient("localhost", 27017)
+        database = connection["DeliveryDB"]
+        collection = database["foodcollection"]
+        collection1 = database["usercollection"]
+
+        print("connect successful")
+        # collection.drop()
+    except Exception as error:
+        print(error)
 
     def __init__(self):
 
+        data = [{"_id": 1, "shop name": "Teapro", "food": ["burger", "sandwich", "tea salad"],
+                 "drink": ["tea", "coffee", "cappuccino"]},
+                {"_id": 2, "shop name": "Pann Ei", "food": ["burger", "sandwich", "tea salad"],
+                 "drink": ["lemontea", "coffee", "cappuccino"]},
+                {"_id": 3, "shop name": "View Corner", "food": ["rice salad", "sandwich", "tea salad"],
+                 "drink": ["tea", "coffee", "cappuccino"]},
+                {"_id": 4, "shop name": "Cafe 99", "food": ["burger", "bread", "tea salad"],
+                 "drink": ["tea", "coffee", "cappuccino"]},
+                {"_id": 5, "shop name": "Fudo Bakery", "food": ["burger", "sandwich", "tea salad"],
+                 "drink": ["tea", "coffee", "cappuccino"]},
+                {"_id": 6, "shop name": "KoDate", "food": ["burger", "sandwich", "tea salad"],
+                 "drink": ["tea", "coffee", "cappuccino", "beer", "wine"]},
+                {"_id": 7, "shop name": "Chuu Bakery", "food": ["burger", "sandwich", "tea salad", "bread", "cake"],
+                 "drink": ["tea", "coffee", "cappuccino"]},
+                {"_id": 8, "shop name": "Cafe 11",
+                 "food": ["burger", "sandwich", "tea salad", "bread", "rice salad", "noodles"],
+                 "drink": ["tea", "coffee", "cappuccino", "beer"]},
+                {"_id": 9, "shop name": "Shwe Lu Lu", "food": ["burger", "sandwich", "tea salad", "hotpot"],
+                 "drink": ["tea", "coffee", "cappuccino", "wine"]}
+
+                ]
+        userdata = {"_id": "1", "username": "Thazin Naing", "password": "thazin123", "phone number": 95977482032,
+                    "address": "Pyin Oo Lwin"}
+
         try:
-            connection = MongoClient("localhost", 27017)
-            database = connection["DeliveryDB"]
-            collection = database["foodcollection"]
-            print("connect successful")
-            collection.drop()
-        except Exception as error:
-            print(error)
-
-        data = [{"_id": 1, "shop name": "Teapro", "food": ["burger", "sandwich", "tea salad"], "drink": ["tea", "coffee", "cappuccino"]},
-                {"_id": 2, "shop name": "Pann Ei", "food": ["burger", "sandwich", "tea salad"], "drink": ["lemontea", "coffee", "cappuccino"]},
-                {"_id": 3, "shop name": "View Corner", "food": ["rice salad", "sandwich", "tea salad"], "drink": ["tea", "coffee", "cappuccino"]},
-                {"_id": 4, "shop name": "Cafe 99", "food": ["burger", "bread", "tea salad"], "drink": ["tea", "coffee", "cappuccino"]},
-                {"_id": 5, "shop name": "Fudo Bakery", "food": ["burger", "sandwich", "tea salad"], "drink": ["tea", "coffee", "cappuccino"]},
-                {"_id": 6, "shop name": "KoDate", "food": ["burger", "sandwich", "tea salad"], "drink": ["tea", "coffee", "cappuccino", "beer", "wine"]},
-                {"_id": 7, "shop name": "Chuu Bakery", "food": ["burger", "sandwich", "tea salad", "bread", "cake"], "drink": ["tea", "coffee", "cappuccino"]},
-                {"_id": 8, "shop name": "Cafe 11", "food": ["burger", "sandwich", "tea salad", "bread", "rice salad", "noodles"], "drink": ["tea", "coffee", "cappuccino", "beer"]},
-                {"_id": 9, "shop name": "Shwe Lu Lu", "food": ["burger", "sandwich", "tea salad", "hotpot"], "drink": ["tea","coffee", "cappuccino", "wine"]}
-
-        ]
-
-        try:
-            collection.insert_many(data)
+            # self.collection.insert_many(data)
+            # self.collection1.insert_one(userdata)
+            data = self.collection1.find().distinct("phone number")
+            for i in data:
+                print(i)
+                print(type(i))
 
             print("Insert successful")
+            print()
 
         except Exception as error:
             print(error)
 
-        data = collection.find().distinct("shop name")
-        for d in data:
-            print(d)
+    def showMenu(self):
+        menu = self.collection.find()
+        l_tos = '\n'.join(map(str, menu))
+        return l_tos
+
+    def create_account(self):
+
+        user_data = {}
+
+
+        user_data['phone'] = int(input("Enter your phone number"))
+
+        user_data['name'] = input("Enter your user name")
+
+        bool = True
+
+
+        while bool:
+            password = input("Enter your password")
+
+            confirmpass = input("Enter your confirmed password")
+
+            if password == confirmpass:
+                user_data['password'] = password
+                self.collection1.insert_one(user_data)
+                break
+
+
+
+    def sign_in(self):
+        sign_phone = input("Enter your phone number")
+        password = input("Enter your password")
+
+    def option(self):
+        print("Press 1 to show menu")
+        print("Press 2 to create account")
+        print("Press 3 to sign in")
+        print("Press 4 to exit")
+        option = input("Enter option")
+        return option
+
+
+
 
 
 obj = delivery()
-
+obj.showMenu()
 
