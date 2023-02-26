@@ -8,14 +8,43 @@ class Client:
         self.ClientMessage = bytes(client_sms, 'utf-8')
 
     def runClient(self):
-        client = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
-        client.connect((self.target_host, self.target_port))
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client.connect((self.target_host, self.target_port))
 
-        client.send(self.ClientMessage)
+        self.client.send(self.ClientMessage)
 
-        recvFromServer = client.recv(4096).decode("utf-8")
+        recvFromServer = self.client.recv(4096).decode("utf-8")
         print(f'Back received from server: {recvFromServer}')
-        client.close()
+
+        if "$" in recvFromServer:
+            self.create(recvFromServer)
+
+        self.client.close()
+
+    def create(self, recvFromServer):
+
+        fdata = self.splitdata("$", recvFromServer)
+        print("first data is ", fdata)
+        self.client.send(fdata)
+        recwrongdata = self.client.recv(4096).decode("utf-8")
+        print("wrong data from server is ", recwrongdata)
+        print("receivefromserver ", recvFromServer)
+        print("recwrongdata", recwrongdata)
+
+        if recvFromServer == recwrongdata:
+
+            self.create(recwrongdata)
+
+
+    def splitdata(self, sign, recvFromServer):
+        splitdata = recvFromServer.split(sign)
+        list_l = []
+        for data in splitdata:
+            d = input(data)
+            list_l.append(d)
+        data = sign.join(map(str, list_l))
+        bytedata = bytes(data, "utf-8")
+        return bytedata
 
 
 
