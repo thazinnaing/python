@@ -59,32 +59,40 @@ class delivery:
         return l_tos
 
     def create_account(self):
+        user = "Enter user name$Enter phone number$Enter password$Enter confirm password"
+        return user
 
-        user_data = {}
-
-
-        user_data['phone'] = int(input("Enter your phone number"))
-
-        user_data['name'] = input("Enter your user name")
-
-        bool = True
-
-
-        while bool:
-            password = input("Enter your password")
-
-            confirmpass = input("Enter your confirmed password")
-
-            if password == confirmpass:
-                user_data['password'] = password
-                self.collection1.insert_one(user_data)
-                break
+    def confirmpassword(self, recvdata):
+        list_l = recvdata.split("$")
+        print("list ", list_l[2])
+        print("list ", list_l[3])
+        if list_l[2] == list_l[3]:
+            return 1
+        else:
+            return 2
 
 
+    def store_account(self, stringdata):
 
-    def sign_in(self):
-        sign_phone = input("Enter your phone number")
-        password = input("Enter your password")
+        id = self.connection['DeliveryDB']["usercollection"]
+        count = id.count_documents({})+1
+        print(count)
+
+        list_1 = stringdata.split("$")
+        print(list_1)
+
+
+        print("Before", list_1[0])
+        list_1.insert(0, count)
+        print("After", list_1[0])
+
+        list_2 = ['_id', 'username', 'phone number', 'password', 'confirmpass']
+
+        list_3 = zip(list_2, list_1)
+        list_4 = (dict(list_3))
+        print(list_4)
+        self.collection1.insert_one(list_4)
+
 
     def option(self):
         print("Press 1 to show menu")
@@ -98,6 +106,8 @@ class delivery:
 
 
 
+
 obj = delivery()
 obj.showMenu()
+
 
