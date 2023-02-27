@@ -8,7 +8,6 @@ class delivery:
         collection = database["foodcollection"]
         collection1 = database["usercollection"]
 
-        print("connect successful")
         # collection.drop()
     except Exception as error:
         print(error)
@@ -39,20 +38,6 @@ class delivery:
         userdata = {"_id": "1", "username": "Thazin Naing", "password": "thazin123", "phone number": 95977482032,
                     "address": "Pyin Oo Lwin"}
 
-        try:
-            # self.collection.insert_many(data)
-            # self.collection1.insert_one(userdata)
-            data = self.collection1.find().distinct("phone number")
-            for i in data:
-                print(i)
-                print(type(i))
-
-            print("Insert successful")
-            print()
-
-        except Exception as error:
-            print(error)
-
     def showMenu(self):
         menu = self.collection.find()
         l_tos = '\n'.join(map(str, menu))
@@ -64,35 +49,77 @@ class delivery:
 
     def confirmpassword(self, recvdata):
         list_l = recvdata.split("$")
-        print("list ", list_l[2])
-        print("list ", list_l[3])
         if list_l[2] == list_l[3]:
             return 1
         else:
             return 2
 
+    def sign_in(self):
+        sign = "Enter phone number:*Enter password"
+        return sign
+
+    def checking_phone(self, phone):
+        global phoneno
+        phonedata = self.collection1.find().distinct("phone number")
+        for d in phonedata:
+            if phone == d:
+                phoneno = 1
+                break
+            else:
+                phoneno = 0
+
+        return phoneno
+
+    def checking_password(self, phone, password):
+        query = {"phone number" : phone}
+        phonedata = self.collection1.find_one(query)
+        passw = phonedata.get("password")
+        if passw == password:
+            return 't'
+        else:
+            return 'f'
 
     def store_account(self, stringdata):
 
         id = self.connection['DeliveryDB']["usercollection"]
         count = id.count_documents({})+1
-        print(count)
-
         list_1 = stringdata.split("$")
-        print(list_1)
-
-
-        print("Before", list_1[0])
         list_1.insert(0, count)
-        print("After", list_1[0])
-
         list_2 = ['_id', 'username', 'phone number', 'password', 'confirmpass']
-
         list_3 = zip(list_2, list_1)
         list_4 = (dict(list_3))
-        print(list_4)
         self.collection1.insert_one(list_4)
 
+    def create_phone(self, phone):
+        intphone = int(phone)
+        if intphone > 9590000000 and intphone < 959999999999:
+            return 't'
+        else:
+            return 'f'
+
+    def phoneinmongo(self, phone):
+        global findcount
+        mongodata = self.collection1.find().distinct("phone number")
+        for d in mongodata:
+            if phone == d:
+                findcount = 1
+                break
+            else:
+                findcount = 0
+        return findcount
+
+
+
+
+    def splitdata(self, sign, recvFromServer):
+        splitdata = recvFromServer.split(sign)
+        list_l = []
+        for data in splitdata:
+            d = input(data)
+            list_l.append(d)
+        data = sign.join(map(str, list_l))
+        bytedata = bytes(data, "utf-8")
+        return bytedata
 
     def option(self):
         print("Press 1 to show menu")
@@ -101,13 +128,3 @@ class delivery:
         print("Press 4 to exit")
         option = input("Enter option")
         return option
-
-
-
-
-
-
-obj = delivery()
-obj.showMenu()
-
-
