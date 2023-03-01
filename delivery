@@ -14,34 +14,54 @@ class delivery:
 
     def __init__(self):
 
-        data = [{"_id": 1, "shop name": "Teapro", "food": ["burger", "sandwich", "tea salad"],
-                 "drink": ["tea", "coffee", "cappuccino"]},
-                {"_id": 2, "shop name": "Pann Ei", "food": ["burger", "sandwich", "tea salad"],
-                 "drink": ["lemontea", "coffee", "cappuccino"]},
-                {"_id": 3, "shop name": "View Corner", "food": ["rice salad", "sandwich", "tea salad"],
-                 "drink": ["tea", "coffee", "cappuccino"]},
-                {"_id": 4, "shop name": "Cafe 99", "food": ["burger", "bread", "tea salad"],
-                 "drink": ["tea", "coffee", "cappuccino"]},
-                {"_id": 5, "shop name": "Fudo Bakery", "food": ["burger", "sandwich", "tea salad"],
-                 "drink": ["tea", "coffee", "cappuccino"]},
-                {"_id": 6, "shop name": "KoDate", "food": ["burger", "sandwich", "tea salad"],
-                 "drink": ["tea", "coffee", "cappuccino", "beer", "wine"]},
-                {"_id": 7, "shop name": "Chuu Bakery", "food": ["burger", "sandwich", "tea salad", "bread", "cake"],
-                 "drink": ["tea", "coffee", "cappuccino"]},
+        fooddata = [{"_id": 1, "shop name": "Teapro",
+                "food": ["burger-2000-Teapro", "sandwich-2000-Teapro", "tea salad-2500-Teapro"],
+                 "drink": ["tea-1000-Teapro", "coffee-1000-Teapro", "cappuccino-4500-Teapro"]},
+                {"_id": 2, "shop name": "Pann Ei",
+                 "food": ["burger-3000-Pann Ei", "chicken pizza-18000-Pann Ei", "sandwich-2000-Pann Ei", "potato marlar-3500-Pann Ei", "tea salad-2000-Pann Ei"],
+                 "drink": ["lemontea-1000-Pann Ei", "coffee-1000-Pann Ei", "cappuccino-3000-Pann Ei"]},
+                {"_id": 3, "shop name": "View Corner",
+                 "food": ["rice salad-3000-View Corner", "fried noodles-3500-View Corner", "fried chicken-4000-View Corner", "expresso-5000-View Corner",  "sandwich-3500-View Corner", "tea salad-1500-View Corner"],
+                 "drink": ["tea-1000-View Corner", "coffee-1000-View Corner", "cappuccino-4500-View Corner"]},
+                {"_id": 4, "shop name": "Cafe 99",
+                 "food": ["burger-3000-Cafe 99", "bread-1000-Cafe 99", "chicken pizza-13000-Cafe 99", "silon tea-2000-Cafe 99", "lemon tea-1000-Cafe 99", "orange-500-Cafe 99", "fried noodles-3000-Cafe 99",  "tea salad-2000-Cafe 99"],
+                 "drink": ["tea-1000", "coffee-1000-Cafe 99", "cappuccino-3500-Cafe 99", "black_coffee-2000-Cafe 99"]},
+                {"_id": 5, "shop name": "Fudo Bakery",
+                 "food": ["burger-3000-Fudo Bakery",  "chocolate cake-28000-Fudo Bakery", "layer cake-3000-Fudo Bakery", "sandwich-3000-Fudo Bakery", "hotdog burger-4500-Fudo Bakery", "cheese pizza-15000-Fudo Bakery", "hamburger-3500-Fudo Bakery"],
+                 "drink": ["strawberry_juice-3500-Fudo Bakery", "coffee-1000-Fudo Bakery", "cappuccino-4500-Fudo Bakery", "lemon juice-4500-Fudo Bakery", "watermelon juice-3000-Fudo Bakery"]},
+                {"_id": 6, "shop name": "KoDate",
+                 "food": ["peanut-3000-KoDate", "fried chicken-5000-KoDate", "rice salad-3000-KoDate", "tea salad-2000-KoDate"],
+                 "drink": ["tea-1000-KoDate", "coffee-800-KoDate", "cappuccino-3000-KoDate", "beer-2000-KoDate", "wine-15000-KoDate", "beer jar-20000-KoDate", "soju-3500-KoDate", "spy-3000-KoDate"]},
+                {"_id": 7, "shop name": "Chuu Bakery",
+                 "food": ["burger-3500-Chuu Bakery", "chocolate_cake-3500-Chuu Bakery", "sandwich-2500-Chuu Bakery", "pudding-2000-Chuu Bakery", "bread-2000-Chuu Bakery", "cake-3000-Chuu Bakery"],
+                 "drink": ["bubble tea-3500-Chuu Bakery", "lemon tea-1000-Chuu Bakery", "chocolate bubble tea-3500-Chuu Bakery", "ice lemon juice-2500-Chuu Bakery", "tea-1000-Chuu Bakery", "hot coffee-1000-Chuu Bakery", "black coffee-2000-Chuu Bakery", "cappuccino-3500-Chuu Bakery"]},
                 {"_id": 8, "shop name": "Cafe 11",
-                 "food": ["burger", "sandwich", "tea salad", "bread", "rice salad", "noodles"],
-                 "drink": ["tea", "coffee", "cappuccino", "beer"]},
-                {"_id": 9, "shop name": "Shwe Lu Lu", "food": ["burger", "sandwich", "tea salad", "hotpot"],
-                 "drink": ["tea", "coffee", "cappuccino", "wine"]}
+                 "food": ["burger-2500-Cafe 11", "sandwich-3000-Cafe 11", "pizza-15000-Cafe 11", "bread-1000-Cafe 11", "pudding-1500-Cafe 11", "rice salad-2000-Cafe 11", "fried noodles-2500-Cafe 11"],
+                 "drink": ["latte-3500-Cafe 11", "hot mocha-4500-Cafe 11", "ice mocha-4500-Cafe 11", "tea-1000-Cafe 11", "coffee-1000-Cafe 11", "cappuccino-4500-Cafe 11", "ice americano-3500-Cafe 11"]},
+                {"_id": 9, "shop name": "Shwe Lu Lu",
+                 "food": ["burger-2500-Shwe Lu Lu", "pizza-13000-Shwe Lu Lu", "chicken sandwich-2500-Shwe Lu Lu", "tea salad-2000-Shwe Lu Lu", "chicken pizza-10000-Shwe Lu Lu"],
+                 "drink": ["tea-1000-Shwe Lu Lu", "ice coffee-2000-Shwe Lu Lu", "cappuccino-2500-Shwe Lu Lu", "silong tea-2000-Shwe Lu Lu"]},
+                {"_id": 10, "shop name": "-Omuk<<korean food>>",
+                 "food": ["toppiki-3500-Omuk<<korean food>>", "burger-2500-Omuk<<korean food>>", "korean noodels-4500-Omuk<<korean food>>", "korean spicy-5500-Omuk<<korean food>>",  "sandwich-3000-Omuk<<korean food>>", "seaweed rice-3500-Omuk<<korean food>>", "fish cake-2200-Omuk<<korean food>>", "korean chicken-7500-Omuk<<korean food>>", "hotpot-15000-Omuk<<korean food>>"],
+                 "drink": ["lemon juice-2000-Omuk<<korean food>>", "coffee-3500-Omuk<<korean food>>", "cappuccino-4500-Omuk<<korean food>>", "soju-4000-Omuk<<korean food>>"]}
 
                 ]
         userdata = {"_id": "1", "username": "Thazin Naing", "password": "thazin123", "phone number": 95977482032,
                     "address": "Pyin Oo Lwin"}
 
+        # self.collection.insert_many(fooddata)
+        # self.collection1.insert_one(userdata)
+
     def showMenu(self):
-        menu = self.collection.find()
-        l_tos = '\n'.join(map(str, menu))
-        return l_tos
+        food = self.collection.find().distinct("food")
+        drink = self.collection.find().distinct('drink')
+
+        l_tos = '\n'.join(map(str, food))
+        l_tos1 = '\n'.join(map(str, drink))
+
+        twostring = l_tos + l_tos1
+        return twostring
+        # print(twostring)
 
     def create_account(self):
         user = "Enter user name$Enter phone number$Enter password$Enter confirm password"
@@ -81,8 +101,9 @@ class delivery:
 
     def store_account(self, stringdata):
 
-        id = self.connection['DeliveryDB']["usercollection"]
-        count = id.count_documents({})+1
+        collect = self.connection['DeliveryDB']["usercollection"]
+        print(collect)
+        count = collect.count_documents({})+1
         list_1 = stringdata.split("$")
         list_1.insert(0, count)
         list_2 = ['_id', 'username', 'phone number', 'password', 'confirmpass']
@@ -90,9 +111,20 @@ class delivery:
         list_4 = (dict(list_3))
         self.collection1.insert_one(list_4)
 
+    def stringcheck(self, phone):
+        try:
+            intphone = int(phone)
+            return 't'
+
+        except Exception as error:
+            return 'f'
+
     def create_phone(self, phone):
+
         intphone = int(phone)
+
         if intphone > 9590000000 and intphone < 959999999999:
+
             return 't'
         else:
             return 'f'
@@ -108,9 +140,6 @@ class delivery:
                 findcount = 0
         return findcount
 
-
-
-
     def splitdata(self, sign, recvFromServer):
         splitdata = recvFromServer.split(sign)
         list_l = []
@@ -122,9 +151,7 @@ class delivery:
         return bytedata
 
     def option(self):
-        print("Press 1 to show menu")
-        print("Press 2 to create account")
-        print("Press 3 to sign in")
-        print("Press 4 to exit")
+        print("Press 1 to show menu\nPress 2 to create account\nPress 3 to sign in\nPress 4 to exit")
         option = input("Enter option")
         return option
+obj = delivery()
