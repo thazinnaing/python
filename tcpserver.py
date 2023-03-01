@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from deliverypj import delivery
 
 
-class TCP_server():
+class TCP_server:
     connection = MongoClient("localhost", 27017)
     database = connection["DeliveryDB"]
     collection = database["usercollection"]
@@ -29,13 +29,23 @@ class TCP_server():
             request = sock.recv(1024).decode("utf-8")
             print("receive data from client: ", request)
 
-
             if request == '1':
                 self.show(sock)
 
             elif request == '2':
                 self.create(sock)
 
+            elif request == '3':
+                self.sign_inaccount(sock)
+
+            elif request == '4':
+                return_data = "exit"
+                sock.send(return_data.encode())
+                pass
+
+            else:
+                return_data = "Invalid option"
+                sock.send(return_data.encode())
 
     def show(self, sock):
 
@@ -43,21 +53,62 @@ class TCP_server():
         return_data = obj.showMenu()
         sock.send(return_data.encode())
 
-
     def create(self, sock):
 
         obj = delivery()
         return_data = obj.create_account()
         sock.send(return_data.encode())
         recvdata = sock.recv(4096).decode("utf-8")
-        print("receive string: ", recvdata)
+        splitdata = recvdata.split("$")
 
-        confirmdata = obj.confirmpassword(recvdata)
-        if confirmdata == 1:
-            obj.store_account(recvdata)
-        else:
-            print("Incorrect password")
+        phonestringcheck = obj.stringcheck(splitdata[1])
+
+        if phonestringcheck == 'f':
+            print("String error!")
             self.create(sock)
+        else:
+            phoneincreate = obj.create_phone(splitdata[1])
+
+            if phoneincreate == 'f':
+                print("phone is out of range!")
+                self.create(sock)
+            else:
+                mongophone = obj.phoneinmongo(splitdata[1])
+                if mongophone == 1:
+                    print("phone is already exist in mongodb!")
+                    self.create(sock)
+                else:
+                    confirmdata = obj.confirmpassword(recvdata)
+                    if confirmdata == 1:
+                        print("correct!!!!!")
+                        obj.store_account(recvdata)
+                        print("Storage success")
+                        self.sign_inaccount(sock)
+
+                    else:
+                        print("Incorrect password")
+                        self.create(sock)
+
+    def sign_inaccount(self, sock):
+        obj = delivery()
+        return_data = obj.sign_in()
+        sock.send(return_data.encode())
+
+        recvdata = sock.recv(4098).decode("utf-8")
+        print("receive sign_in data :", recvdata)
+        splitdata = recvdata.split('*')
+        print(splitdata)
+        print(splitdata[0])
+        checkphone = obj.checking_phone(splitdata[0])
+        print(checkphone)
+        if checkphone == 0:
+            print("wrong phone number")
+            self.sign_inaccount(sock)
+        else:
+            checkpass = obj.checking_password(splitdata[0], splitdata[1])
+            if checkpass == 'f':
+                print("wrong password")
+                self.sign_inaccount(sock)
 
 
 if __name__ == '__main__':
