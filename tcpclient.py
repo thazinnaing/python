@@ -1,5 +1,6 @@
-import  socket
+import socket
 from deliverypj import delivery
+
 
 class Client:
     def __init__(self, client_sms):
@@ -19,48 +20,36 @@ class Client:
         if "$" in recvFromServer:
             self.create(recvFromServer)
 
+        elif "*" in recvFromServer:
+            self.login(recvFromServer)
+
         self.client.close()
 
     def create(self, recvFromServer):
-
-        fdata = self.splitdata("$", recvFromServer)
-        print("first data is ", fdata)
+        obj = delivery()
+        fdata = obj.splitdata("$", recvFromServer)
         self.client.send(fdata)
         recwrongdata = self.client.recv(4096).decode("utf-8")
-        print("wrong data from server is ", recwrongdata)
-        print("receivefromserver ", recvFromServer)
-        print("recwrongdata", recwrongdata)
+        print("return data is", recwrongdata)
 
         if recvFromServer == recwrongdata:
-
             self.create(recwrongdata)
+        else:
+            self.login(recwrongdata)
+
+    def login(self, recvFromServer):
+        obj = delivery()
+        fdata = obj.splitdata("*", recvFromServer)
+        self.client.send(fdata)
+        wrongdata = self.client.recv(4096).decode("utf-8")
+
+        if recvFromServer == wrongdata:
+            self.login(wrongdata)
 
 
-    def splitdata(self, sign, recvFromServer):
-        splitdata = recvFromServer.split(sign)
-        list_l = []
-        for data in splitdata:
-            d = input(data)
-            list_l.append(d)
-        data = sign.join(map(str, list_l))
-        bytedata = bytes(data, "utf-8")
-        return bytedata
-
-
-
-    def main(self):
-        while True:
-            obj = delivery()
-            sms = obj.option()
-            myclient = Client(sms)
-            myclient.runClient()
-
-
-
-
-
-if __name__=="__main__":
-
-
-        tcpClient = Client("Hello server")
-        tcpClient.main()
+if __name__ == "__main__":
+    tcpClient = Client("Hello server")
+    obj = delivery()
+    sms = obj.option()
+    myclient = Client(sms)
+    myclient.runClient()
