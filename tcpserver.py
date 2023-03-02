@@ -52,6 +52,10 @@ class TCP_server:
         obj = delivery()
         return_data = obj.showMenu()
         sock.send(return_data.encode())
+        recvdata = sock.recv(4096).decode("utf-8")
+        if recvdata == "Done":
+            self.orderr(sock)
+
 
     def create(self, sock):
 
@@ -99,16 +103,23 @@ class TCP_server:
         splitdata = recvdata.split('*')
         print(splitdata)
         print(splitdata[0])
-        checkphone = obj.checking_phone(splitdata[0])
+        phone = int(splitdata[0])
+        checkphone = obj.checking_phone(phone)
         print(checkphone)
         if checkphone == 0:
             print("wrong phone number")
             self.sign_inaccount(sock)
         else:
-            checkpass = obj.checking_password(splitdata[0], splitdata[1])
+            checkpass = obj.checking_password(phone, splitdata[1])
             if checkpass == 'f':
                 print("wrong password")
                 self.sign_inaccount(sock)
+            else:
+                self.show(sock)
+
+    def orderr(self, sock):
+        str = "\n>>>Please choose food to  order->"
+        sock.send(str.encode())
 
 
 if __name__ == '__main__':
