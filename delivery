@@ -30,7 +30,7 @@ class delivery:
                  "food": {"burger": 3000,  "chocolate cake": 28000, "layer cake": 3000, "sandwich": 3000, "hotdog burger": 4500, "cheese pizza": 15000, "hamburger": 3500},
                  "drink": {"strawberry juice": 3500, "coffee": 1000, "cappuccino": 4500, "lemon juice": 4500, "watermelon juice": 3000}}
                 ]
-        userdata = {"_id": "1", "username": "Thazin Naing", "password": "thazin123", "phone number": 95977482032}
+        userdata = {"_id": "1", "username": "Thazin Naing", "password": "thazin123", "phone number": 95977482032, "History":[] }
 
         # self.collection.insert_many(fooddata)
         # self.collection1.insert_one(userdata)
@@ -90,7 +90,9 @@ class delivery:
         count = collect.count_documents({})+1
         list_1 = stringdata.split("$")
         list_1.insert(0, count)
-        list_2 = ['_id', 'username', 'phone number', 'password']
+        list_1.insert(4, [])
+
+        list_2 = ['_id', 'username', 'phone number', 'password', 'History']
         list_3 = zip(list_2, list_1)
         list_4 = (dict(list_3))
         self.collection1.insert_one(list_4)
@@ -139,12 +141,34 @@ class delivery:
         bytedata = bytes(data, "utf-8")
         return bytedata
 
+    def checkmenu(self, checkme, fooddrink):
+        fooddata = self.collection.find().distinct(fooddrink)
+        list_l = []
+        count = 0
+        for i in fooddata:
+
+            for j in i:
+
+                if j == checkme:
+                    data = self.collection.find_one({fooddrink: i})
+                    shop = data.get("shop name")
+                    price = i.get(j)
+                    p = str(price)
+                    d = "-"
+                    f = ":"
+                    strl = shop + d + checkme + f + p
+                    list_l.append(strl)
+                    count = count + 1
+        if count > 0:
+            rdata = '\n'.join((map(str, list_l)))
+            r = "\nEnter shop name"
+            s = rdata + r
+            return s
+        else:
+            return 'f'
+
     def option(self):
         print("Press 1 to show menu\nPress 2 to create account\nPress 3 to sign in\nPress 4 to exit")
         option = input("Enter option")
         return option
 obj = delivery()
-obj.showMenu()
-
-
-
