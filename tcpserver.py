@@ -7,11 +7,17 @@ from deliverypj import delivery
 class TCP_server:
     connection = MongoClient("localhost", 27017)
     database = connection["DeliveryDB"]
-    collection = database["usercollection"]
+    collection = database["foodcollection"]
+    collection1 = database["usercollection"]
+    global list_l
+    list_l = []
+
+
 
     def __init__(self):
         self.server_ip = 'localhost'
         self.server_port = 9999
+
 
     def main(self):
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -118,8 +124,96 @@ class TCP_server:
                 self.show(sock)
 
     def orderr(self, sock):
-        str = "\n>>>Please choose food to  order->"
-        sock.send(str.encode())
+        global count
+        strr = "Press 1 to choose item\nPress 2 to cancel item\nPress 3 to order"
+        sock.send(strr.encode())
+        recvdata = sock.recv(4098).decode("utf-8")
+        if recvdata == '1':
+            ord = "Press 1 for food item\nPress 2 for drink item"
+            sock.send(ord.encode())
+
+            orddata = sock.recv(4098).decode("utf-8")
+
+            if orddata == '1':
+                self.choosefooddrink(sock, "food")
+
+            else:
+                self.choosefooddrink(sock, "drink")
+
+        elif recvdata == '2':
+            self.cancel(sock)
+
+        elif recvdata == '3':
+            count = 0
+            amount = "Total amount is : "
+
+            for item in range(len(list_l)):
+                count +=list_l[item]["price"]*list_l[item]["numberofitem"]
+            countstring = str(count)
+            pay = "\n>>>>Enter payment method<<<<\nPress 1 to Prepaid\nPress 2 to cash on deli "
+            threestring = amount + countstring + pay
+            sock.send(threestring.encode())
+            inputdata = sock.recv(4098).decode("utf-8")
+            print(inputdata)
+
+
+
+
+
+
+    def cancel(self, sock):
+        pr = ">>>>Your order history<<<<\n"
+        ltos = '\n'.join(map(str, list_l))
+        p = "\nEnter cancel item name"
+        twos = pr + ltos + p
+        sock.send(twos.encode())
+        rr = sock.recv(4096).decode("utf-8")
+        for item in range(len(list_l)):
+            if list_l[item]["item"] == rr:
+                list_l.pop(item)
+                break
+
+        can = "item cancel success\n >>>>Now your order is<<<<\n"
+        ltost = '\n'.join(map(str, list_l))
+        senddata = can + ltost
+        sock.send(senddata.encode())
+        self.orderr(sock)
+
+    def choosefooddrink(self, sock, fd):
+        global pricee
+        obj = delivery()
+        fooddata = self.collection.find().distinct(fd)
+        food = '\n'.join((map(str, fooddata)))
+        cfood = "\nPlease choose item"
+        senddata = food + cfood
+        sock.send(senddata.encode())
+        rec = sock.recv(4098).decode("utf-8")
+        check = obj.checkmenu(rec, fd)
+        if check == "f":
+            pr = "Invalid order item"
+            sock.send(pr.encode())
+            self.orderr(sock)
+
+        else:
+
+            sock.send(check.encode())
+            receiver = sock.recv(4098).decode("utf-8")
+            send = "Enter number of item"
+            sock.send(send.encode())
+            numberdata = sock.recv(4096).decode("utf-8")
+            numitem = int(numberdata)
+            fooddata = self.collection.find_one({"shop name": receiver})
+            f = fooddata.get(fd)
+            for i in f:
+                if i == rec:
+                    p = f.get(i)
+                    pricee = int(p)
+
+            appenddata = {"shop name": receiver, "item": rec, "price": pricee, "numberofitem": numitem}
+            list_l.append(appenddata)
+            print(list_l)
+
+            self.orderr(sock)
 
 
 if __name__ == '__main__':
