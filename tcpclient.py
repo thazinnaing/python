@@ -15,8 +15,16 @@ class Client:
         self.client.send(self.ClientMessage)
 
         recvFromServer = self.client.recv(4096).decode("utf-8")
+        self.select_option(recvFromServer)
 
+    def page_option(self, recv):
 
+        in_rec = input(recv)
+        self.client.send(in_rec.encode())
+        recv_FromServer = self.client.recv(4096).decode("utf-8")
+        self.select_option(recv_FromServer)
+
+    def select_option(self, recvFromServer):
 
         if "$" in recvFromServer:
             self.create(recvFromServer)
@@ -32,38 +40,6 @@ class Client:
 
         self.client.close()
 
-    def showmenu(self, recvFromServer):
-        obj = delivery()
-        print(">>>>>>>>>>>>This is our menu<<<<<<<<<<<<\n", recvFromServer)
-        data = "Done"
-        self.client.send(data.encode())
-        self.chooseoption()
-
-
-
-    def create(self, recvFromServer):
-        obj = delivery()
-        fdata = obj.splitdata("$", recvFromServer)
-        self.client.send(fdata)
-        recwrongdata = self.client.recv(4096).decode("utf-8")
-        print("return data is", recwrongdata)
-
-        if recvFromServer == recwrongdata:
-            self.create(recwrongdata)
-        else:
-            self.login(recwrongdata)
-
-    def login(self, recvFromServer):
-        obj = delivery()
-        fdata = obj.splitdata("*", recvFromServer)
-        self.client.send(fdata.encode())
-        wrongdata = self.client.recv(4096).decode("utf-8")
-
-        if recvFromServer == wrongdata:
-            self.login(wrongdata)
-        else:
-            print("receive from server data", wrongdata)
-
     def chooseoption(self):
         recvFromServer = self.client.recv(4096).decode("utf-8")
         data = input(recvFromServer)
@@ -75,9 +51,57 @@ class Client:
         elif "cancel" in recv:
             self.cancelitem(recv)
 
-        elif "amount" in recv:
-            paymethod = input(recv)
-            self.client.send(paymethod.encode())
+        elif "location" in recv:
+            self.order(recv)
+
+        elif "show" in recv:
+            self.page_option(recv)
+
+    def showmenu(self, recvFromServer):
+        print(">>>>>>>>>>>>This is our menu<<<<<<<<<<<<\n", recvFromServer)
+        data = "Done"
+        self.client.send(data.encode())
+        self.chooseoption()
+
+
+
+    def create(self, recvFromServer):
+        obj = delivery()
+        fdata = obj.splitdata("$", recvFromServer)
+        self.client.send(fdata.encode())
+        recwrongdata = self.client.recv(4096).decode("utf-8")
+        print("return data is", recwrongdata)
+
+        if recvFromServer == recwrongdata:
+            self.create(recwrongdata)
+        else:
+            self.page_option(recwrongdata)
+
+    def order(self, recv):
+        paymethod = input(recv)
+        self.client.send(paymethod.encode())
+        fee_rec = self.client.recv(4096).decode("utf-8")
+        in_fee = input(fee_rec)
+        self.client.send(in_fee.encode())
+        pay_rec = self.client.recv(4096).decode("utf-8")
+        if "success" in pay_rec:
+            print(pay_rec)
+            self.chooseoption()
+        else:
+            print(pay_rec)
+            self.chooseoption()
+
+    def login(self, recvFromServer):
+        obj = delivery()
+        fdata = obj.splitdata("*", recvFromServer)
+        print(fdata)
+        self.client.send(fdata.encode())
+        wrongdata = self.client.recv(4096).decode("utf-8")
+
+        if recvFromServer == wrongdata:
+            self.login(wrongdata)
+        else:
+            self.showmenu(wrongdata)
 
     def cancelitem(self, recv):
         canceli = input(recv)
