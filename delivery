@@ -30,7 +30,7 @@ class delivery:
                  "food": {"burger": 3000,  "chocolate cake": 28000, "layer cake": 3000, "sandwich": 3000, "hotdog burger": 4500, "cheese pizza": 15000, "hamburger": 3500},
                  "drink": {"strawberry juice": 3500, "coffee": 1000, "cappuccino": 4500, "lemon juice": 4500, "watermelon juice": 3000}}
                 ]
-        userdata = {"_id": "1", "username": "Thazin Naing", "password": "thazin123", "phone number": 95977482032, "History":[] }
+        userdata = {"_id": "1", "username": "Thazin Naing", "password": "thazin123", "phone number": "95977482032", "History":[] }
 
         # self.collection.insert_many(fooddata)
         # self.collection1.insert_one(userdata)
@@ -138,8 +138,7 @@ class delivery:
             d = input(data)
             list_l.append(d)
         data = sign.join(map(str, list_l))
-        bytedata = bytes(data, "utf-8")
-        return bytedata
+        return data
 
     def checkmenu(self, checkme, fooddrink):
         fooddata = self.collection.find().distinct(fooddrink)
@@ -171,4 +170,11 @@ class delivery:
         print("Press 1 to show menu\nPress 2 to create account\nPress 3 to sign in\nPress 4 to exit")
         option = input("Enter option")
         return option
+
+
+
 obj = delivery()
+
+
+
+
