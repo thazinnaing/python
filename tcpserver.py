@@ -34,24 +34,26 @@ class TCP_server:
         with client_socket as sock:
             request = sock.recv(1024).decode("utf-8")
             print("receive data from client: ", request)
+            self.menu_option(sock, request)
 
-            if request == '1':
-                self.show(sock)
+    def menu_option(self, sock, request):
+        if request == '1':
+            self.show(sock)
 
-            elif request == '2':
-                self.create(sock)
+        elif request == '2':
+            self.create(sock)
 
-            elif request == '3':
-                self.sign_inaccount(sock)
+        elif request == '3':
+            self.sign_inaccount(sock)
 
-            elif request == '4':
-                return_data = "exit"
-                sock.send(return_data.encode())
-                pass
+        elif request == '4':
+            return_data = "exit"
+            sock.send(return_data.encode())
+            pass
 
-            else:
-                return_data = "Invalid option"
-                sock.send(return_data.encode())
+        else:
+            return_data = "Invalid option"
+            sock.send(return_data.encode())
 
     def show(self, sock):
 
@@ -93,26 +95,29 @@ class TCP_server:
                         print("correct!!!!!")
                         obj.store_account(recvdata)
                         print("Storage success")
-                        self.sign_inaccount(sock)
+                        self.pageoption(sock)
 
                     else:
                         print("Incorrect password")
                         self.create(sock)
 
     def sign_inaccount(self, sock):
+        global phone_index
+        phone_index = ''
         obj = delivery()
         return_data = obj.sign_in()
         sock.send(return_data.encode())
 
-        recvdata = sock.recv(4098).decode("utf-8")
-        print("receive sign_in data :", recvdata)
-        splitdata = recvdata.split('*')
-        print(splitdata)
-        print(splitdata[0])
-        phone = int(splitdata[0])
-        checkphone = obj.checking_phone(phone)
-        print(checkphone)
-        if checkphone == 0:
+        recv_data = sock.recv(4098).decode("utf-8")
+        print("receive sign_in data :", recv_data)
+        splitdata = recv_data.split('*')
+
+        phone = splitdata[0]
+
+        check_phone = obj.checking_phone(phone)
+        print(check_phone)
+
+        if check_phone == 0:
             print("wrong phone number")
             self.sign_inaccount(sock)
         else:
@@ -121,13 +126,18 @@ class TCP_server:
                 print("wrong password")
                 self.sign_inaccount(sock)
             else:
+                phone_index = phone
                 self.show(sock)
 
     def orderr(self, sock):
         global count
-        strr = "Press 1 to choose item\nPress 2 to cancel item\nPress 3 to order"
+        strr = "Press 1 to choose item\nPress 2 to cancel item\nPress 3 to order\nPress 4 to exit"
         sock.send(strr.encode())
         recvdata = sock.recv(4098).decode("utf-8")
+        self.option(sock, recvdata)
+
+
+    def option(self, sock, recvdata):
         if recvdata == '1':
             ord = "Press 1 for food item\nPress 2 for drink item"
             sock.send(ord.encode())
@@ -144,22 +154,58 @@ class TCP_server:
             self.cancel(sock)
 
         elif recvdata == '3':
-            count = 0
-            amount = "Total amount is : "
+            self.order(sock)
 
-            for item in range(len(list_l)):
-                count +=list_l[item]["price"]*list_l[item]["numberofitem"]
-            countstring = str(count)
-            pay = "\n>>>>Enter payment method<<<<\nPress 1 to Prepaid\nPress 2 to cash on deli "
-            threestring = amount + countstring + pay
-            sock.send(threestring.encode())
-            inputdata = sock.recv(4098).decode("utf-8")
-            print(inputdata)
+        elif recvdata == '4':
+            self.pageoption(sock)
 
+    def pageoption(self, sock):
+        op = "Press 1 to show menu\nPress 2 to create account\nPress 3 to sign in\nPress 4 to exit\nEnter option"
+        sock.send(op.encode())
+        recive = sock.recv(1024).decode("utf-8")
+        self.menu_option(sock, recive)
 
 
+    def listpop(self):
+        for item in range(len(list_l)):
+            list_l.pop(item)
+
+    def order(self, sock):
+        count = 0
+        amount = "Total fee is :: "
+
+        for item in range(len(list_l)):
+            count += list_l[item]["price"] * list_l[item]["numberofitem"]
+        countstring = str(count)
+        location = "\nEnter your location"
+        addstring = amount + countstring + location
+        sock.send(addstring.encode())
+        location_data = sock.recv(4098).decode("utf-8")
+        deli_amount = 3000
+        de = "Delivery fee is 3000\n"
+        fee = count + deli_amount
+        fee_str = str(fee)
+        paymethod = "\n>>>>Choose your pay method<<<<\nPress 1 for KBZpay\nPress 2 for WavePay"
+        am = "After adding delivery fee, Total fee is ::"
+        addingstr = de + am + fee_str + paymethod
+        sock.send(addingstr.encode())
+        rec_input = sock.recv(1024).decode("utf-8")
+        if rec_input == '1' or rec_input == '2':
+            order = "Order successful\nPlease wait for 15 mins......"
+            sock.send(order.encode())
+            user_index = self.collection1.find_one({"phone number": phone_index})
+            print(user_index)
+
+            self.listpop()
+            self.orderr(sock)
 
 
+        else:
+            order = "Order Unsuccessful\n Please try to reorder....."
+            sock.send(order.encode())
+
+            self.listpop()
+            self.orderr(sock)
 
     def cancel(self, sock):
         pr = ">>>>Your order history<<<<\n"
