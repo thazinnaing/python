@@ -17,16 +17,16 @@ class delivery:
         fooddata = [{"_id": 1, "shop name": "Teapro",
                 "food": {"burger": 2000, "sandwich": 2000, "tea salad": 2500},
                  "drink": {"tea": 1000, "coffee": 1000, "cappuccino": 4500}},
-                {"_id": 2, "shop name": "Pann Ei",
+                {"_id": 2, "shop name": "Pann",
                  "food": {"burger": 3000, "chicken pizza": 18000, "sandwich": 2000, "potato marlar": 3500,},
                  "drink": {"lemontea": 1000, "coffee": 1000, "cappuccino": 3000}},
-                {"_id": 3, "shop name": "View Corner",
+                {"_id": 3, "shop name": "View",
                  "food": {"rice salad": 3000, "fried noodles": 3500, "fried chicken": 4000, "expresso": 5000,  "sandwich": 3500},
                  "drink": {"tea": 800, "coffee": 1000, "cappuccino": 4500}},
-                {"_id": 4, "shop name": "Cafe 99",
+                {"_id": 4, "shop name": "Cafe99",
                  "food": {"burger": 3000, "bread": 1000, "chicken pizza": 13000, "silon tea": 2000, "lemon tea": 1000, "orange juice": 1500, "fried noodles": 3000},
                  "drink": {"coffee": 1000, "cappuccino": 3500, "black_coffee": 2000}},
-                {"_id": 5, "shop name": "Fudo Bakery",
+                {"_id": 5, "shop name": "Fudo",
                  "food": {"burger": 3000,  "chocolate cake": 28000, "layer cake": 3000, "sandwich": 3000, "hotdog burger": 4500, "cheese pizza": 15000, "hamburger": 3500},
                  "drink": {"strawberry juice": 3500, "coffee": 1000, "cappuccino": 4500, "lemon juice": 4500, "watermelon juice": 3000}}
                 ]
@@ -36,15 +36,24 @@ class delivery:
         # self.collection1.insert_one(userdata)
 
     def showMenu(self):
+        list1 = []
         food = self.collection.find().distinct("food")
-        drink = self.collection.find().distinct('drink')
+        for item in food:
+            for i in item:
+                list1.append(i)
+        st = '\n'.join(map(str, list1))
+        list2 = []
+        drink = self.collection.find().distinct("drink")
+        for item in drink:
+            for i in item:
+                list2.append(i)
+        st2 = '\n'.join(map(str, list2))
 
+        f = ">>>>> Food <<<<<\n"
+        d = "\n>>>>> Drink <<<<<\n"
+        stringadd = f + st + d + st2
+        return stringadd
 
-        l_tos = '\n'.join(map(str, food))
-        l_tos1 = '\n'.join(map(str, drink))
-
-        twostring = l_tos + l_tos1
-        return twostring
 
     def create_account(self):
         user = "Enter user name$Enter phone number$Enter password$Enter confirm password"
@@ -64,7 +73,6 @@ class delivery:
     def checking_phone(self, phone):
         global phoneno
         phonedata = self.collection1.find().distinct("phone number")
-        print("sdferfre", phonedata)
         for d in phonedata:
             if phone == d:
                 phoneno = 1
@@ -140,6 +148,22 @@ class delivery:
         data = sign.join(map(str, list_l))
         return data
 
+    def checkshopname(self, item, shopname, fd):
+        food = self.collection.find().distinct(fd)
+        print(food)
+        for title in food:
+            for ite in title:
+                if ite == item:
+                    fooddata = self.collection.find_one({fd: title})
+                    shop = fooddata.get("shop name")
+                    print(shop)
+                    if shop == shopname:
+                        return 't'
+                    else:
+                        pass
+
+        return 'f'
+
     def checkmenu(self, checkme, fooddrink):
         fooddata = self.collection.find().distinct(fooddrink)
         list_l = []
@@ -147,7 +171,6 @@ class delivery:
         for i in fooddata:
 
             for j in i:
-
                 if j == checkme:
                     data = self.collection.find_one({fooddrink: i})
                     shop = data.get("shop name")
@@ -172,9 +195,5 @@ class delivery:
         return option
 
 
-
 obj = delivery()
-
-
-
 
