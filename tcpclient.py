@@ -72,8 +72,6 @@ class Client:
         self.client.send(data.encode())
         self.chooseoption()
 
-
-
     def create(self, recvFromServer):
         obj = delivery()
         fdata = obj.splitdata("$", recvFromServer)
@@ -89,35 +87,30 @@ class Client:
         if "phone" in recv:
             ph = input(recv)
             self.client.send(ph.encode())
-
             receive = self.client.recv(4096).decode("utf-8")
-            if "Invalid" in receive:
-                print(receive)
-                rece = self.client.recv(4096).decode("utf-8")
-                self.order(rece)
-            else:
-                locate = input(receive)
-                self.client.send(locate.encode())
+            if "location" in receive:
+                lo = input(receive)
 
+                self.client.send(lo.encode())
                 fee_rec = self.client.recv(4096).decode("utf-8")
+
                 in_fee = input(fee_rec)
                 self.client.send(in_fee.encode())
                 pay_rec = self.client.recv(4096).decode("utf-8")
+
                 if "success" in pay_rec:
                     print(pay_rec)
                     self.chooseoption()
                 else:
                     print(pay_rec)
                     self.chooseoption()
-
-
-
+            else:
+                print(receive)
+                rece = self.client.recv(4096).decode("utf-8")
+                self.order(rece)
         else:
             print(recv)
             self.chooseoption()
-
-
-
 
     def login(self, recvFromServer):
         obj = delivery()
@@ -135,105 +128,77 @@ class Client:
         self.client.send(canceloption.encode())
         recv = self.client.recv(4096).decode("utf-8")
 
-        if "cancel" or "haven't" in recv:
+        print(">>>>>>>>", recv)
+        if "haven't" in recv:
+            print(recv)
+            self.chooseoption()
+        elif "cancel" in recv:
             self.cancelitem(recv)
-        elif "change" or "haven't" in recv:
+        elif "change"in recv:
             self.changenoofitem(recv)
-
-        elif "history" or "haven't" in recv:
+        elif "history"in recv:
             self.completecancel(recv)
+        else:
+            rec = self.client.recv(4096).decode("utf-8")
+            self.cancel(rec)
 
+    def completecancel(self, recv):
+        can = input(recv)
+        self.client.send(can.encode())
+        rec = self.client.recv(4096).decode("utf-8")
+        if "order" in rec:
+            print(rec)
+            self.chooseoption()
+        else:
+            self.chooseoption()
+
+    def changenoofitem(self, recv):
+        ch = input(recv)
+        self.client.send(ch.encode())
+        item = self.client.recv(4096).decode("utf-8")
+        if "item" in item:
+            in_item = input(item)
+            self.client.send(in_item.encode())
+
+            self.chooseoption()
         else:
             print(recv)
             rec = self.client.recv(4096).decode("utf-8")
             self.cancel(rec)
 
-    def completecancel(self, recv):
-        if "history" in recv:
-            can = input(recv)
-            self.client.send(can.encode())
-            rec = self.client.recv(4096).decode("utf-8")
-            if "order" in rec:
-                print(rec)
-                self.chooseoption()
-            else:
-                self.chooseoption()
-        else:
-            print(recv)
-            self.chooseoption()
-
-
-
-
-
-    def changenoofitem(self, recv):
-        if "change" in recv:
-            ch = input(recv)
-            self.client.send(ch.encode())
-            item = self.client.recv(4096).decode("utf-8")
-            in_item = input(item)
-            self.client.send(in_item.encode())
-            self.chooseoption()
-        else:
-            print(recv)
-            self.chooseoption()
-
-
-
-
     def cancelitem(self, recv):
-        if "cancel" in recv:
-            canceli = input(recv)
-            self.client.send(canceli.encode())
-            rece = self.client.recv(4096).decode("utf-8")
-            if "Not" in rece:
-                print(rece)
-                receiver = self.client.recv(4096).decode("utf-8")
-                self.cancel(receiver)
-            else:
-                print(rece)
-                self.chooseoption()
+        canceli = input(recv)
+        self.client.send(canceli.encode())
+        rece = self.client.recv(4096).decode("utf-8")
+        if "Not" in rece:
+            print(rece)
+            receiver = self.client.recv(4096).decode("utf-8")
+            self.cancel(receiver)
         else:
-            print(recv)
+            print(rece)
             self.chooseoption()
-
-
-
-
-
-
-
 
     def choose_order(self, recv):
         foodordrink = input(recv)
         self.client.send(foodordrink.encode())
-
         r = self.client.recv(4096).decode("utf-8")
-
         if "Invalid" in r:
             print(r)
             self.chooseoption()
-
         else:
             re = input(r)
             self.client.send(re.encode())
             rece = self.client.recv(4096).decode("utf-8")
             if "Invalid" in rece:
                 print(rece)
-
                 self.chooseoption()
             else:
                 receive = input(rece)
-
-
                 self.client.send(receive.encode())
                 rr = self.client.recv(4096).decode("utf-8")
-
-
                 if "Invalid" in rr:
                     print(rr)
                     self.chooseoption()
-
                 else:
                     toinput = input(rr)
                     self.client.send(toinput.encode())
@@ -242,7 +207,6 @@ class Client:
                         print(receiver)
                         self.chooseoption()
                     else:
-
                         self.chooseoption()
 
 
