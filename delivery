@@ -15,25 +15,30 @@ class delivery:
     def __init__(self):
 
         fooddata = [{"_id": 1, "shop name": "Teapro",
-                "food": {"burger": 2000, "sandwich": 2000, "tea salad": 2500},
-                 "drink": {"tea": 1000, "coffee": 1000, "cappuccino": 4500}},
-                {"_id": 2, "shop name": "Pann",
-                 "food": {"burger": 3000, "chicken pizza": 18000, "sandwich": 2000, "potato marlar": 3500,},
-                 "drink": {"lemontea": 1000, "coffee": 1000, "cappuccino": 3000}},
-                {"_id": 3, "shop name": "View",
-                 "food": {"rice salad": 3000, "fried noodles": 3500, "fried chicken": 4000, "expresso": 5000,  "sandwich": 3500},
-                 "drink": {"tea": 800, "coffee": 1000, "cappuccino": 4500}},
-                {"_id": 4, "shop name": "Cafe99",
-                 "food": {"burger": 3000, "bread": 1000, "chicken pizza": 13000, "silon tea": 2000, "lemon tea": 1000, "orange juice": 1500, "fried noodles": 3000},
-                 "drink": {"coffee": 1000, "cappuccino": 3500, "black_coffee": 2000}},
-                {"_id": 5, "shop name": "Fudo",
-                 "food": {"burger": 3000,  "chocolate cake": 28000, "layer cake": 3000, "sandwich": 3000, "hotdog burger": 4500, "cheese pizza": 15000, "hamburger": 3500},
-                 "drink": {"strawberry juice": 3500, "coffee": 1000, "cappuccino": 4500, "lemon juice": 4500, "watermelon juice": 3000}}
-                ]
-        userdata = {"_id": "1", "username": "Thazin Naing", "password": "thazin123", "phone number": "95977482032", "History":[] }
+                     "food": {"burger": 2000, "sandwich": 2000, "tea salad": 2500},
+                     "drink": {"tea": 1000, "coffee": 1000, "cappuccino": 4500}},
+                    {"_id": 2, "shop name": "Pann",
+                     "food": {"burger": 3000, "chicken pizza": 18000, "sandwich": 2000, "potato marlar": 3500, },
+                     "drink": {"lemontea": 1000, "coffee": 1000, "cappuccino": 3000}},
+                    {"_id": 3, "shop name": "View",
+                     "food": {"rice salad": 3000, "fried noodles": 3500, "fried chicken": 4000, "expresso": 5000,
+                              "sandwich": 3500},
+                     "drink": {"tea": 800, "coffee": 1000, "cappuccino": 4500}},
+                    {"_id": 4, "shop name": "Cafe99",
+                     "food": {"burger": 3000, "bread": 1000, "chicken pizza": 13000, "silon tea": 2000,
+                              "lemon tea": 1000, "orange juice": 1500, "fried noodles": 3000},
+                     "drink": {"coffee": 1000, "cappuccino": 3500, "black_coffee": 2000}},
+                    {"_id": 5, "shop name": "Fudo",
+                     "food": {"burger": 3000, "chocolate cake": 28000, "layer cake": 3000, "sandwich": 3000,
+                              "hotdog burger": 4500, "cheese pizza": 15000, "hamburger": 3500},
+                     "drink": {"strawberry juice": 3500, "coffee": 1000, "cappuccino": 4500, "lemon juice": 4500,
+                               "watermelon juice": 3000}}
+                    ]
+        userdata = {"_id": 1, "username": "Thazin Naing", "password": "thazin123", "phone number": "95977482032"}
 
         # self.collection.insert_many(fooddata)
         # self.collection1.insert_one(userdata)
+
 
     def showMenu(self):
         list1 = []
@@ -53,7 +58,6 @@ class delivery:
         d = "\n>>>>> Drink <<<<<\n"
         stringadd = f + st + d + st2
         return stringadd
-
 
     def create_account(self):
         user = "Enter user name$Enter phone number$Enter password$Enter confirm password"
@@ -95,12 +99,12 @@ class delivery:
 
         collect = self.connection['DeliveryDB']["usercollection"]
         print(collect)
-        count = collect.count_documents({})+1
+        count = collect.count_documents({}) + 1
         list_1 = stringdata.split("$")
         list_1.insert(0, count)
         list_1.insert(4, [])
 
-        list_2 = ['_id', 'username', 'phone number', 'password', 'History']
+        list_2 = ['_id', 'username', 'phone number', 'password']
         list_3 = zip(list_2, list_1)
         list_4 = (dict(list_3))
         self.collection1.insert_one(list_4)
@@ -137,7 +141,6 @@ class delivery:
     def order(self):
         orderdata = "\n>>>>>>You can order now<<<<<<\n"
         return orderdata
-
 
     def splitdata(self, sign, recvFromServer):
         splitdata = recvFromServer.split(sign)
@@ -197,3 +200,4 @@ class delivery:
 
 obj = delivery()
 
+# db.collection.update({"name":"vahid"},{$push:{ "visited": {id:2,'date':'324324',noskhe:['d','n']}}})
