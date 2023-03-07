@@ -11,6 +11,7 @@ class TCP_server:
     collection1 = database["usercollection"]
     global list_l
     list_l = []
+    obj = delivery()
 
     def __init__(self):
         self.server_ip = 'localhost'
@@ -53,44 +54,40 @@ class TCP_server:
             sock.send(return_data.encode())
             self.pageoption(sock)
 
-
     def show(self, sock):
-
-        obj = delivery()
-        return_data = obj.showMenu()
+        return_data = self.obj.showMenu()
         sock.send(return_data.encode())
         recvdata = sock.recv(4096).decode("utf-8")
         if recvdata == "Done":
             self.orderr(sock)
 
     def create(self, sock):
-        obj = delivery()
-        return_data = obj.create_account()
+        return_data = self.obj.create_account()
         sock.send(return_data.encode())
         recvdata = sock.recv(4096).decode("utf-8")
         splitdata = recvdata.split("$")
 
-        phonestringcheck = obj.stringcheck(splitdata[1])
+        phonestringcheck = self.obj.stringcheck(splitdata[1])
 
         if phonestringcheck == 'f':
             print("String error!")
             self.create(sock)
         else:
-            phoneincreate = obj.create_phone(splitdata[1])
+            phoneincreate = self.obj.create_phone(splitdata[1])
 
             if phoneincreate == 'f':
                 print("phone is out of range!")
                 self.create(sock)
             else:
-                mongophone = obj.phoneinmongo(splitdata[1])
+                mongophone = self.obj.phoneinmongo(splitdata[1])
                 if mongophone == 1:
                     print("phone is already exist in mongodb!")
                     self.create(sock)
                 else:
-                    confirmdata = obj.confirmpassword(recvdata)
+                    confirmdata = self.obj.confirmpassword(recvdata)
                     if confirmdata == 1:
                         print("correct!!!!!")
-                        obj.store_account(recvdata)
+                        self.obj.store_account(recvdata)
                         print("Storage success")
                         self.pageoption(sock)
 
@@ -101,8 +98,7 @@ class TCP_server:
     def sign_inaccount(self, sock):
         global phone_index
         phone_index = ''
-        obj = delivery()
-        return_data = obj.sign_in()
+        return_data = self.obj.sign_in()
         sock.send(return_data.encode())
 
         recv_data = sock.recv(4098).decode("utf-8")
@@ -111,14 +107,14 @@ class TCP_server:
 
         phone = splitdata[0]
 
-        check_phone = obj.checking_phone(phone)
+        check_phone = self.obj.checking_phone(phone)
         print(check_phone)
 
         if check_phone == 0:
             print("wrong phone number")
             self.sign_inaccount(sock)
         else:
-            checkpass = obj.checking_password(phone, splitdata[1])
+            checkpass = self.obj.checking_password(phone, splitdata[1])
             if checkpass == 'f':
                 print("wrong password")
                 self.sign_inaccount(sock)
@@ -132,7 +128,6 @@ class TCP_server:
         sock.send(strr.encode())
         recvdata = sock.recv(4098).decode("utf-8")
         self.option(sock, recvdata)
-
 
     def option(self, sock, recvdata):
         if recvdata == '1':
@@ -152,7 +147,6 @@ class TCP_server:
                 sock.send(op.encode())
                 self.orderr(sock)
 
-
         elif recvdata == '2':
             self.cancel(sock)
 
@@ -167,7 +161,6 @@ class TCP_server:
             sock.send(op.encode())
             self.orderr(sock)
 
-
     def pageoption(self, sock):
         op = "\nPress 1 to show menu\nPress 2 to create account\nPress 3 to sign in\nPress 4 to exit\nEnter option"
         sock.send(op.encode())
@@ -179,58 +172,64 @@ class TCP_server:
             list_l.pop(item)
 
     def order(self, sock):
-        obj = delivery()
         length = len(list_l)
-        if length > 0:
-            count = 0
 
+        if length > 0:
+            totalfee = 0
 
             for item in range(len(list_l)):
-                count += list_l[item]["price"] * list_l[item]["numberofitem"]
-            countstring = str(count)
+                totalfee += list_l[item]["price"] * list_l[item]["numberofitem"]
+            countstring = str(totalfee)
 
-            phone = "\nEnter your phone number"
-
-            amount = "Total fee is :: "
+            phone = "\n\nEnter your phone number"
+            amount = "\nTotal fee is :: "
             addstring = amount + countstring + phone
+
             sock.send(addstring.encode())
             phone_data = sock.recv(4098).decode("utf-8")
-            intcheck = obj.stringcheck(phone_data)
 
-            if intcheck == 't':
-                loca = "\nEnter your location"
-                sock.send(loca.encode())
-                location = sock.recv(1024).decode("utf-8")
+            check_ph = self.obj.stringcheck(phone_data)
 
-                deli_amount = 3000
-                de = "Delivery fee is 3000\n"
-                fee = count + deli_amount
-                fee_str = str(fee)
-                paymethod = "\n>>>>Choose your pay method<<<<\nPress 1 for KBZpay\nPress 2 for WavePay"
-                am = "After adding delivery fee, Total fee is ::"
-                addingstr = de + am + fee_str + paymethod
-                sock.send(addingstr.encode())
+            if check_ph == 't':
+                check_num = self.obj.create_phone(phone_data)
+                if check_num == "t":
+                    loca = "\nEnter your location"
+                    sock.send(loca.encode())
+                    location = sock.recv(1024).decode("utf-8")
 
-                rec_input = sock.recv(1024).decode("utf-8")
-                if rec_input == '1' or rec_input == '2':
-                    order = "Order successful\nPlease wait for 15 mins......"
-                    sock.send(order.encode())
+                    deli_amount = 3000
+                    de = "Delivery fee is 3000\n"
+                    fee = totalfee + deli_amount
+                    fee_str = str(fee)
+                    paymethod = "\n>>>>Choose your pay method<<<<\nPress 1 for KBZpay\nPress 2 for WavePay"
+                    am = "After adding delivery fee, Total fee is ::"
+                    addingstr = de + am + fee_str + paymethod
 
-                    self.listpop()
-                    self.orderr(sock)
+                    sock.send(addingstr.encode())
+                    rec_input = sock.recv(1024).decode("utf-8")
+                    if rec_input == '1' or rec_input == '2':
+                        order = "Order successful\nPlease wait for 15 mins......"
+                        sock.send(order.encode())
+
+                        self.listpop()
+                        self.orderr(sock)
+
+                    else:
+                        order = "\nOrder Unsuccessful\n Please try to reorder....."
+                        sock.send(order.encode())
+
+                        self.listpop()
+                        self.orderr(sock)
 
                 else:
-                    order = "\nOrder Unsuccessful\n Please try to reorder....."
-                    sock.send(order.encode())
-
-                    self.listpop()
-                    self.orderr(sock)
+                    pp = "\nIncorrect phone number"
+                    sock.send(pp.encode())
+                    self.order(sock)
 
             else:
                 pp = "\nIncorrect phone number"
                 sock.send(pp.encode())
                 self.order(sock)
-
         else:
             pri = "\nYou haven't ordered any item yet!"
             sock.send(pri.encode())
@@ -264,7 +263,6 @@ class TCP_server:
             string = pr + ltos + p
             sock.send(string.encode())
             inpput = sock.recv(1024).decode("utf-8")
-            print("lllll", inpput)
 
             if inpput == '1':
                 for item in range(len(list_l)):
@@ -284,9 +282,9 @@ class TCP_server:
             sock.send(pri.encode())
             self.orderr(sock)
 
-
     def changenoofitem(self, sock):
         length = len(list_l)
+        count = 0
         if length > 0:
             name = "\n>>>>>>For change number of item<<<<<"
             pr = "\n>>>>Your order history<<<<\n"
@@ -295,23 +293,39 @@ class TCP_server:
             string = pr + ltos + name + p
 
             sock.send(string.encode())
+
             rec_name = sock.recv(1024).decode("utf-8")
 
-            num = "\nEnter number of item to change ::"
-            sock.send(num.encode())
-            num_item = sock.recv(1024).decode("utf-8")
-            noofitem = int(num_item)
             for item in range(len(list_l)):
                 if list_l[item]["item"] == rec_name:
-                    list_l[item]["numberofitem"] = noofitem
+                    count = +1
                     break
-            print(list_l)
-            self.orderr(sock)
+
+            if count > 0:
+                num = "\nEnter number of item to change ::"
+                sock.send(num.encode())
+                num_item = sock.recv(1024).decode("utf-8")
+
+                noofitem = int(num_item)
+                print(list_l)
+
+                for item in range(len(list_l)):
+
+                    if list_l[item]["item"] == rec_name:
+                        list_l[item]["numberofitem"] = noofitem
+                        print(list_l[item]["numberofitem"])
+                        break
+                print(list_l)
+                self.orderr(sock)
+            else:
+                op = "\nNot found order like that"
+                sock.send(op.encode())
+                self.cancel(sock)
+
         else:
             pri = "\nYou haven't ordered any item yet!"
             sock.send(pri.encode())
             self.orderr(sock)
-
 
     def cancelitem(self, sock):
         length = len(list_l)
@@ -323,6 +337,7 @@ class TCP_server:
             twos = pr + ltos + p
             sock.send(twos.encode())
             rr = sock.recv(4096).decode("utf-8")
+
             for item in range(len(list_l)):
                 if list_l[item]["item"] == rr:
                     list_l.pop(item)
@@ -346,7 +361,6 @@ class TCP_server:
 
     def choosefooddrink(self, sock, fd):
         global pricee
-        obj = delivery()
         list1 = []
         food = self.collection.find().distinct(fd)
         for item in food:
@@ -359,7 +373,7 @@ class TCP_server:
         senddata = f + st + cfood
         sock.send(senddata.encode())
         rec = sock.recv(4098).decode("utf-8")
-        check = obj.checkmenu(rec, fd)
+        check =self.obj.checkmenu(rec, fd)
         if check == "f":
             pr = "\nInvalid order item"
             sock.send(pr.encode())
@@ -370,27 +384,33 @@ class TCP_server:
             sock.send(check.encode())
             receiver = sock.recv(4098).decode("utf-8")
 
-            cshop = obj.checkshopname(rec, receiver, fd)
+            cshop = self.obj.checkshopname(rec, receiver, fd)
             if cshop == 't':
                 send = "\nEnter number of item"
                 sock.send(send.encode())
                 numberdata = sock.recv(4096).decode("utf-8")
                 try:
                     numitem = int(numberdata)
-                    op = "Done"
-                    sock.send(op.encode())
+                    if numitem > 0:
+                        op = "Done"
+                        sock.send(op.encode())
 
-                    fooddata = self.collection.find_one({"shop name": receiver})
-                    f = fooddata.get(fd)
-                    for i in f:
-                        if i == rec:
-                            p = f.get(i)
-                            pricee = int(p)
+                        fooddata = self.collection.find_one({"shop name": receiver})
+                        f = fooddata.get(fd)
+                        for i in f:
+                            if i == rec:
+                                p = f.get(i)
+                                pricee = int(p)
 
-                    appenddata = {"shop name": receiver, "item": rec, "price": pricee, "numberofitem": numitem}
-                    list_l.append(appenddata)
-                    print(list_l)
-                    self.orderr(sock)
+                        appenddata = {"shop name": receiver, "item": rec, "price": pricee, "numberofitem": numitem}
+                        list_l.append(appenddata)
+                        print(list_l)
+
+                        self.orderr(sock)
+                    else:
+                        p = "\nInvalid , number of item must greater than 0"
+                        sock.send(p.encode())
+                        self.orderr(sock)
 
                 except Exception as error:
                     p = "Invalid string ..... Enter 1,2,3,..."
