@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+import time
 
 
 class delivery:
@@ -197,7 +198,46 @@ class delivery:
         option = input("Enter option")
         return option
 
+    def addhistory(self, phone, item_fee, deli_amount, list_l):
+        deli_fee = str(deli_amount)
+        total_amount = item_fee + deli_amount
+        total_fee = str(total_amount)
 
-obj = delivery()
+        l1 = []
+        for item in list_l:
+
+            shopname = item.get("shop name")
+            itemname = item.get("item")
+            price = item.get("price")
+            noofitem = item.get("numberofitem")
+            addst = shopname + "-" + itemname + "-" + str(price) + "-" + str(noofitem)
+            l1.append(addst)
+
+        itemlist = '\n'.join((map(str, l1)))
+        #
+        # for price in range(len(list_l)):
+        #     totalfee += list_l[price]["price"] * list_l[price]["numberofitem"]
+        # total_fee = str(totalfee)
+
+        local_time = self.timestr()
+        history = "Phone no     -> " + phone + "\n" + ">>item<<" + "\n" + itemlist + "\n" + "Item fee    -> " + item_fee + "\n" + "Delivery fee -> " + deli_fee + "\n" + "Total amount -> " + total_fee + "\n" + "Local time   -> " + local_time
+        print(history)
+
+    def split_history(self, history):
+        split_data = history.split("\n")
+        split_price = split_data[-2].split("-> ")
+        fee = int(split_price[1])
+        print(fee)
+
+    def timestr(self):
+
+        named_tuple = time.localtime()
+        time_string = time.strftime("%m-%d-%Y, %b-%I:%M:%S-%p", named_tuple)
+
+        return time_string
+
+# obj = delivery()
+# obj.addhistory()
+
 
 # db.collection.update({"name":"vahid"},{$push:{ "visited": {id:2,'date':'324324',noskhe:['d','n']}}})
