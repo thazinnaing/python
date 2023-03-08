@@ -175,15 +175,15 @@ class TCP_server:
         length = len(list_l)
 
         if length > 0:
-            totalfee = 0
+            tfee = 0
 
             for item in range(len(list_l)):
-                totalfee += list_l[item]["price"] * list_l[item]["numberofitem"]
-            countstring = str(totalfee)
+                tfee += list_l[item]["price"] * list_l[item]["numberofitem"]
+            totalfee = str(tfee)
 
             phone = "\n\nEnter your phone number"
             amount = "\nTotal fee is :: "
-            addstring = amount + countstring + phone
+            addstring = amount + totalfee + phone
 
             sock.send(addstring.encode())
             phone_data = sock.recv(4098).decode("utf-8")
@@ -199,7 +199,7 @@ class TCP_server:
 
                     deli_amount = 3000
                     de = "Delivery fee is 3000\n"
-                    fee = totalfee + deli_amount
+                    fee = tfee + deli_amount
                     fee_str = str(fee)
                     paymethod = "\n>>>>Choose your pay method<<<<\nPress 1 for KBZpay\nPress 2 for WavePay"
                     am = "After adding delivery fee, Total fee is ::"
@@ -207,9 +207,23 @@ class TCP_server:
 
                     sock.send(addingstr.encode())
                     rec_input = sock.recv(1024).decode("utf-8")
-                    if rec_input == '1' or rec_input == '2':
+                    if rec_input == '1':
                         order = "Order successful\nPlease wait for 15 mins......"
                         sock.send(order.encode())
+
+                        history_data = self.obj.addhistory(phone_data, totalfee, deli_amount, list_l)
+                        print("history data: ", history_data)
+
+
+                        self.listpop()
+                        self.orderr(sock)
+
+                    elif rec_input == '2':
+                        order = "Order successful\nPlease wait for 15 mins......"
+                        sock.send(order.encode())
+
+                        history_data = self.obj.addhistory(phone_data, totalfee, deli_amount, list_l)
+                        print("history data: ", history_data)
 
                         self.listpop()
                         self.orderr(sock)
@@ -413,8 +427,8 @@ class TCP_server:
                         self.orderr(sock)
 
                 except Exception as error:
-                    p = "Invalid string ..... Enter 1,2,3,..."
-                    sock.send(p.encode())
+                    error.error = "Invalid string ..... Enter 1,2,3,..."
+                    sock.send(error.error.encode())
                     self.orderr(sock)
 
             else:
