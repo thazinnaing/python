@@ -19,6 +19,8 @@ class Client:
 
     def page_option(self, recv):
 
+        print("pageoption", recv)
+
         in_rec = input(recv)
         self.client.send(in_rec.encode())
         recv_FromServer = self.client.recv(4096).decode("utf-8")
@@ -37,6 +39,8 @@ class Client:
 
         elif "exit" in recvFromServer:
             print(recvFromServer)
+            pass
+
 
         else:
             recv = self.client.recv(4096).decode("utf-8")
@@ -56,10 +60,13 @@ class Client:
         elif "cancel" in recv:
             self.cancel(recv)
 
-        elif "phone" or "haven't" in recv:
+        elif "haven't" in recv:
             self.order(recv)
 
-        elif "show" in recv:
+        elif "phone" in recv:
+            self.order(recv)
+
+        elif "exit" in recv:
             self.page_option(recv)
 
         else:
@@ -90,20 +97,27 @@ class Client:
             receive = self.client.recv(4096).decode("utf-8")
             if "location" in receive:
                 lo = input(receive)
-
                 self.client.send(lo.encode())
                 fee_rec = self.client.recv(4096).decode("utf-8")
-
-                in_fee = input(fee_rec)
-                self.client.send(in_fee.encode())
-                pay_rec = self.client.recv(4096).decode("utf-8")
-
-                if "success" in pay_rec:
-                    print(pay_rec)
-                    self.chooseoption()
+                print("kfffffflll", fee_rec)
+                if "Value" in fee_rec:
+                    print("ffff")
+                    print(fee_rec)
+                    receiver = self.client.recv(4096).decode("utf-8")
+                    print("lllllllllllll", receiver)
+                    self.order(receiver)
                 else:
-                    print(pay_rec)
-                    self.chooseoption()
+
+                    in_fee = input(fee_rec)
+                    self.client.send(in_fee.encode())
+                    pay_rec = self.client.recv(4096).decode("utf-8")
+
+                    if "success" in pay_rec:
+                        print(pay_rec)
+                        self.chooseoption()
+                    else:
+                        print(pay_rec)
+                        self.chooseoption()
             else:
                 print(receive)
                 rece = self.client.recv(4096).decode("utf-8")
