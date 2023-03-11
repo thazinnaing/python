@@ -8,6 +8,10 @@ class delivery:
         database = connection["DeliveryDB"]
         collection = database["foodcollection"]
         collection1 = database["usercollection"]
+        collection2 = database["un_signin_user"]
+        collection3 = database["delivery_collection"]
+        collection4 = database["admin"]
+
 
         # collection.drop()
     except Exception as error:
@@ -37,8 +41,20 @@ class delivery:
                     ]
         userdata = {"_id": 1, "username": "Thazin Naing", "password": "thazin123", "phone number": "95977482032"}
 
+        deli_data = [{"_id": 1, "username": "Aung Kaung Satt", "NRC no": "9/Pa Oo La(C)083451", "phone number": "959666777777", "Access Location": ["Pyin Oo Lwin", "Anisakhan"]},
+                     {"_id": 2, "username": "Si Thu", "NRC no": "9/Pa Oo La(C)083452", "phone number": "959666666666", "Access Location": ["Mandalay", "Pyin Sar"]},
+                     {"_id": 3, "username": "Su Htet", "NRC no": "9/Pa Oo La(C)083453", "phone number": "959777777777", "Access Location": ["Yangon", "Hlae Dan"]},
+                     {"_id": 4, "username": "Khant Ko", "NRC no": "9/Pa Oo La(C)083454", "phone number": "959888888888", "Access Location": ["Banmaw", "Myit Kyee Nar"]},
+                     {"_id": 5, "username": "Nay Thway", "NRC no": "9/Pa Oo La(C)083455", "phone number": "9596111111111", "Access Location": ["Sagaing", "Magway"]}]
+
+        admin = {"_id": 1, "user name": "Admin", "password": "root", "phone number": "959100000000"}
+
+        # self.collection2.insert_one(userdata)
+
         # self.collection.insert_many(fooddata)
         # self.collection1.insert_one(userdata)
+        # self.collection3.insert_many(deli_data)
+        # self.collection4.insert_one(admin)
 
 
     def showMenu(self):
@@ -75,17 +91,35 @@ class delivery:
         sign = "Enter phone number:*Enter password"
         return sign
 
+    def check_admin_phone(self, phone):
+        phonedata = self.collection4.find().distinct("phone number")
+        for d in phonedata:
+            if phone == d:
+                return 't'
+            else:
+                pass
+
+        return 'f'
+
+    def check_admin_password(self, phone, password):
+        query = {"phone number": phone}
+        phonedata = self.collection4.find_one(query)
+        passw = phonedata.get("password")
+        if passw == password:
+            return 't'
+        else:
+            return 'f'
+
     def checking_phone(self, phone):
-        global phoneno
+
         phonedata = self.collection1.find().distinct("phone number")
         for d in phonedata:
             if phone == d:
-                phoneno = 1
-                break
+                return 1
             else:
-                phoneno = 0
+                pass
 
-        return phoneno
+        return 0
 
     def checking_password(self, phone, password):
         query = {"phone number": phone}
@@ -99,11 +133,11 @@ class delivery:
     def store_account(self, stringdata):
 
         collect = self.connection['DeliveryDB']["usercollection"]
-        print(collect)
+
         count = collect.count_documents({}) + 1
         list_1 = stringdata.split("$")
         list_1.insert(0, count)
-        list_1.insert(4, [])
+
 
         list_2 = ['_id', 'username', 'phone number', 'password']
         list_3 = zip(list_2, list_1)
@@ -154,14 +188,20 @@ class delivery:
 
     def checkshopname(self, item, shopname, fd):
         food = self.collection.find().distinct(fd)
-        print(food)
+
         for title in food:
             for ite in title:
-                if ite == item:
+                foodie = ite.upper()
+                item_data = item.upper()
+
+                if foodie == item_data:
                     fooddata = self.collection.find_one({fd: title})
                     shop = fooddata.get("shop name")
-                    print(shop)
-                    if shop == shopname:
+
+                    shopie = shop.upper()
+                    shop_data = shopname.upper()
+
+                    if shopie == shop_data:
                         return 't'
                     else:
                         pass
@@ -175,14 +215,16 @@ class delivery:
         for i in fooddata:
 
             for j in i:
-                if j == checkme:
+                item = j.lower()
+                food = checkme.lower()
+                if item == food:
                     data = self.collection.find_one({fooddrink: i})
                     shop = data.get("shop name")
                     price = i.get(j)
                     p = str(price)
                     d = "-"
                     f = ":"
-                    strl = shop + d + checkme + f + p
+                    strl = shop + d + food + f + p
                     list_l.append(strl)
                     count = count + 1
         if count > 0:
@@ -198,7 +240,8 @@ class delivery:
         option = input("Enter option")
         return option
 
-    def addhistory(self, phone, item_fee, deli_amount, list_l):
+    def addhistory(self, phone, item_fee, deli_amount, list_l, location):
+
         deli_fee = str(deli_amount)
         total_amount = item_fee + deli_amount
         total_fee = str(total_amount)
@@ -214,20 +257,18 @@ class delivery:
             l1.append(addst)
 
         itemlist = '\n'.join((map(str, l1)))
-        #
-        # for price in range(len(list_l)):
-        #     totalfee += list_l[price]["price"] * list_l[price]["numberofitem"]
-        # total_fee = str(totalfee)
 
         local_time = self.timestr()
-        history = "Phone no     -> " + phone + "\n" + ">>item<<" + "\n" + itemlist + "\n" + "Item fee    -> " + item_fee + "\n" + "Delivery fee -> " + deli_fee + "\n" + "Total amount -> " + total_fee + "\n" + "Local time   -> " + local_time
-        print(history)
+        history = "Phone no     -> " + phone + "\n" + ">>item<<" + "\n" + itemlist + "\n" + "Item fee    -> " + str(item_fee) + "\n" + "Delivery fee -> " + deli_fee + "\n" + "Total amount -> " + total_fee + "\n" + "Location     -> " + location + "\n" + "Local time   -> " + local_time
+        return history
+
+    # + "\n" + "Location     -> " + location
 
     def split_history(self, history):
         split_data = history.split("\n")
         split_price = split_data[-2].split("-> ")
         fee = int(split_price[1])
-        print(fee)
+
 
     def timestr(self):
 
@@ -235,9 +276,124 @@ class delivery:
         time_string = time.strftime("%m-%d-%Y, %b-%I:%M:%S-%p", named_tuple)
 
         return time_string
+    def poplist(self):
+        global list_l
+        list_l = []
+        list_l = [{'shop name': 'Teapro', 'item': 'burger', 'price': 2000, 'numberofitem': 4},
+                  {'shop name': 'Pann', 'item': 'sandwich', 'price': 2000, 'numberofitem': 2}]
 
-# obj = delivery()
-# obj.addhistory()
+
+        for i in range(len(list_l)):
+            list_l.pop()
 
 
-# db.collection.update({"name":"vahid"},{$push:{ "visited": {id:2,'date':'324324',noskhe:['d','n']}}})
+    def sign_inaddhistory(self, phone, insertstring):
+
+        for data in range(len(phone)):
+
+            var = phone[data]
+
+            query = {"phone number": var}
+
+            phoneinmongo = self.collection1.find_one(query)
+            id = phoneinmongo.get("_id")
+            self.collection1.update_one({"_id": id}, {"$push": {"order history": insertstring}})
+            print("insert history success")
+
+    def check_phoneindb(self, phone):
+        list1 = []
+        ph = self.collection1.find().distinct("phone number")
+
+        for data in ph:
+            if data == phone:
+                list1.append(data)
+                return list1
+            else:
+                pass
+        return "f"
+
+    def un_singin(self, phone, history):
+        list1 = []
+        collect = self.connection['DeliveryDB']["un_signin_user"]
+        count = collect.count_documents({}) + 1
+        list1.append(phone)
+
+
+        list1.insert(0, count)
+        list1.insert(2, [])
+
+        list_2 = ['_id', 'phone number']
+        list_3 = zip(list_2, list1)
+        list_4 = (dict(list_3))
+        self.collection2.insert_one(list_4)
+        print("\ninsert success")
+
+        query = {"phone number": phone}
+        self.collection2.find_one(query)
+        self.collection2.update_one({"phone number": phone}, {"$push": {"order history": history}})
+        print("\nhistory success")
+
+    def phone_checkindb(self, phone):
+        data = self.collection2.find().distinct("phone number")
+        for item in data:
+
+            if item == phone:
+                return "t"
+
+            else:
+                pass
+        return "f"
+
+    def add_un_sign_history(self, phone, history):
+        phonedata = self.collection2.find().distinct("phone number")
+        print(phonedata)
+        for item in phonedata:
+            if item == phone:
+                self.collection2.update_one({"phone number": phone}, {"$push": {"order history": history}})
+            else:
+                pass
+        print('update success')
+
+    def location(self):
+        lo = "Press 1 :: Mandalay\nPress 2 :: Yangon\nPress 3 :: Hlae Dan\n" \
+             "Press 4 :: Banmaw\nPress 5 :: Anisakhan\nPress 6 :: Myit Kyee Nar\nPress 7 :: Pyin Sar\n" \
+             "Press 8 :: Magway\nPress 9 ::Sagaing\nPress 10 :: Pyin Oo Lwin"
+        return lo
+
+    def choose_location(self, location):
+        loc = int(location)
+        list = ["Mandalay", "Yangon", "Hlae Dan", "Banmaw", "Anisakhan", "Myit Kyee Nar", "Pyin Sar", "Magway", "Sagaing", "Pyin Oo Lwin"]
+
+        for item in range(len(list)):
+            if item+1 == loc:
+                name = list[item]
+
+                return name
+
+    def chosse_deli(self, loc_no):
+        if loc_no == "10" or loc_no == "5":
+            return 1
+        elif loc_no == "1" or loc_no == "7":
+            return 2
+        elif loc_no == "2" or loc_no == "3":
+            return 3
+        elif loc_no == "4" or loc_no == "6":
+            return 4
+        elif loc_no == "9" or loc_no == "8":
+            return 5
+
+    def add_deli_history(self, deli_index, history):
+
+        deli_data = self.collection3.find().distinct("_id")
+        for item in deli_data:
+            if item == deli_index:
+                self.collection3.update_one({"_id": deli_index}, {"$push": {"order history": history}})
+                break
+        print("update deli history success")
+
+
+obj = delivery()
+
+
+
+
